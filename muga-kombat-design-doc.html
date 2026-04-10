@@ -1,0 +1,954 @@
+<!DOCTYPE html>
+<html lang="ru" data-theme="dark">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Muga Kombat — Game Design Doc</title>
+<link href="https://api.fontshare.com/v2/css?f[]=satoshi@400,500,700&f[]=cabinet-grotesk@700,800&display=swap" rel="stylesheet">
+<style>
+:root {
+  --bg: #0d0d0f;
+  --surface: #141417;
+  --surface-2: #1a1a1e;
+  --surface-3: #222228;
+  --border: rgba(255,255,255,0.1);
+  --border-bright: rgba(255,255,255,0.22);
+  --text: #e8e6e1;
+  --text-muted: #8a8884;
+  --text-faint: #555350;
+  --accent: #7fffb2;
+  --accent-dim: rgba(127,255,178,0.12);
+  --accent-glow: rgba(127,255,178,0.25);
+  --red: #ff5a6a;
+  --orange: #ffaa4a;
+  --blue: #5ba3ff;
+  --purple: #b07aff;
+  --yellow: #ffd84a;
+  --font-display: 'Cabinet Grotesk', sans-serif;
+  --font-body: 'Satoshi', sans-serif;
+  --r: 8px;
+  --r-lg: 14px;
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: var(--font-body);
+  font-size: 15px;
+  line-height: 1.65;
+  color: var(--text);
+  background: var(--bg);
+  min-height: 100dvh;
+}
+.layout {
+  display: grid;
+  grid-template-columns: 260px 1fr;
+  min-height: 100dvh;
+}
+/* SIDEBAR */
+.sidebar {
+  position: sticky;
+  top: 0;
+  height: 100dvh;
+  overflow-y: auto;
+  background: var(--surface);
+  border-right: 1px solid var(--border);
+  padding: var(--space-6) var(--space-4);
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+.sidebar-logo {
+  font-family: var(--font-display);
+  font-size: 18px;
+  font-weight: 800;
+  color: var(--accent);
+  margin-bottom: var(--space-4);
+  padding-bottom: var(--space-4);
+  border-bottom: 1px solid var(--border);
+  letter-spacing: -0.5px;
+}
+.sidebar-logo span { color: var(--text-muted); font-weight: 400; font-size: 12px; display: block; margin-top: 2px; }
+.sidebar-section {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 1.2px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  margin-top: var(--space-4);
+  margin-bottom: var(--space-1);
+  padding-left: var(--space-2);
+}
+.sidebar a {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+  padding: 7px var(--space-2);
+  border-radius: var(--r);
+  color: var(--text-muted);
+  text-decoration: none;
+  font-size: 13.5px;
+  transition: all 0.15s;
+}
+.sidebar a:hover { color: var(--text); background: rgba(255,255,255,0.06); }
+.sidebar a .dot {
+  width: 8px; height: 8px;
+  border-radius: 50%;
+  flex-shrink: 0;
+}
+
+/* MAIN */
+.main {
+  padding: var(--space-10) var(--space-10) var(--space-12);
+  max-width: 1000px;
+}
+h1 {
+  font-family: var(--font-display);
+  font-size: 36px;
+  font-weight: 800;
+  letter-spacing: -1px;
+  line-height: 1.1;
+  color: var(--text);
+  margin-bottom: var(--space-2);
+}
+h1 .tag {
+  font-family: var(--font-body);
+  font-size: 13px;
+  font-weight: 500;
+  background: var(--accent-dim);
+  border: 1px solid rgba(127,255,178,0.3);
+  color: var(--accent);
+  padding: 2px 10px;
+  border-radius: 99px;
+  vertical-align: middle;
+  margin-left: var(--space-2);
+}
+.subtitle {
+  color: var(--text-muted);
+  font-size: 15px;
+  margin-bottom: var(--space-10);
+  max-width: 620px;
+}
+/* SECTION */
+.section {
+  margin-bottom: var(--space-12);
+  scroll-margin-top: var(--space-8);
+}
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: var(--space-3);
+  margin-bottom: var(--space-5);
+}
+.section-icon {
+  width: 36px; height: 36px;
+  border-radius: var(--r);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 17px;
+  flex-shrink: 0;
+}
+h2 {
+  font-family: var(--font-display);
+  font-size: 22px;
+  font-weight: 800;
+  letter-spacing: -0.5px;
+  color: var(--text);
+}
+.section-meta {
+  font-size: 12px;
+  color: var(--text-faint);
+  font-weight: 500;
+  margin-left: auto;
+}
+/* CARD */
+.card {
+  background: var(--surface-2);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-3);
+}
+.card-title {
+  font-size: 13px;
+  font-weight: 700;
+  letter-spacing: 0.3px;
+  color: var(--text);
+  margin-bottom: var(--space-2);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+.card p, .card li {
+  font-size: 13.5px;
+  color: var(--text-muted);
+  line-height: 1.7;
+  max-width: none;
+}
+.card ul, .card ol { padding-left: var(--space-4); }
+.card li { margin-bottom: 4px; }
+.card li::marker { color: var(--text-faint); }
+/* GRID */
+.grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: var(--space-3); }
+.grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: var(--space-3); }
+/* BADGE */
+.badge {
+  display: inline-flex;
+  align-items: center;
+  font-size: 11px;
+  font-weight: 700;
+  padding: 2px 8px;
+  border-radius: 99px;
+  letter-spacing: 0.3px;
+}
+.badge-green { background: var(--accent-dim); color: var(--accent); border: 1px solid rgba(127,255,178,0.25); }
+.badge-red { background: rgba(255,90,106,0.12); color: var(--red); border: 1px solid rgba(255,90,106,0.25); }
+.badge-blue { background: rgba(91,163,255,0.12); color: var(--blue); border: 1px solid rgba(91,163,255,0.25); }
+.badge-purple { background: rgba(176,122,255,0.12); color: var(--purple); border: 1px solid rgba(176,122,255,0.25); }
+.badge-orange { background: rgba(255,170,74,0.12); color: var(--orange); border: 1px solid rgba(255,170,74,0.25); }
+.badge-yellow { background: rgba(255,216,74,0.12); color: var(--yellow); border: 1px solid rgba(255,216,74,0.25); }
+/* IDEA */
+.idea {
+  display: flex;
+  gap: var(--space-3);
+  padding: var(--space-3) var(--space-4);
+  border-left: 2px solid var(--border-bright);
+  margin-bottom: var(--space-2);
+  border-radius: 0 var(--r) var(--r) 0;
+  background: rgba(255,255,255,0.02);
+}
+.idea-icon { font-size: 16px; flex-shrink: 0; line-height: 1.7; }
+.idea-text { font-size: 13px; color: var(--text-muted); }
+.idea-text strong { color: var(--text); font-weight: 600; }
+/* FUTURE PLAN */
+.plan-item {
+  display: grid;
+  grid-template-columns: auto 1fr auto;
+  align-items: start;
+  gap: var(--space-3);
+  padding: var(--space-4);
+  border: 1px solid var(--border);
+  border-radius: var(--r-lg);
+  margin-bottom: var(--space-3);
+  background: var(--surface-2);
+  transition: border-color 0.15s, background 0.15s;
+}
+.plan-item:hover { border-color: var(--border-bright); background: var(--surface-3); }
+.plan-num {
+  width: 28px; height: 28px;
+  border-radius: 50%;
+  border: 1px solid var(--border-bright);
+  display: flex; align-items: center; justify-content: center;
+  font-size: 12px;
+  font-weight: 700;
+  color: var(--text-faint);
+  flex-shrink: 0;
+  margin-top: 2px;
+}
+.plan-title { font-size: 14px; font-weight: 600; color: var(--text); margin-bottom: 4px; }
+.plan-desc { font-size: 12.5px; color: var(--text-muted); line-height: 1.6; }
+/* STAT ROW */
+.stat-table { width: 100%; border-collapse: collapse; }
+.stat-table th {
+  text-align: left;
+  font-size: 11px;
+  font-weight: 700;
+  letter-spacing: 0.8px;
+  text-transform: uppercase;
+  color: var(--text-faint);
+  padding: var(--space-2) var(--space-3);
+  border-bottom: 1px solid var(--border);
+}
+.stat-table td {
+  padding: 10px var(--space-3);
+  font-size: 13px;
+  color: var(--text-muted);
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  vertical-align: top;
+}
+.stat-table td:first-child { color: var(--text); font-weight: 500; }
+.stat-table tr:last-child td { border-bottom: none; }
+/* STATUS BLOCK */
+.status-row { display: flex; gap: var(--space-2); flex-wrap: wrap; margin-bottom: var(--space-4); }
+/* CURRENT STATUS */
+.current-box {
+  background: linear-gradient(135deg, rgba(127,255,178,0.06), transparent);
+  border: 1px solid rgba(127,255,178,0.2);
+  border-radius: var(--r-lg);
+  padding: var(--space-5);
+  margin-bottom: var(--space-10);
+}
+.current-box h3 {
+  font-size: 12px;
+  font-weight: 700;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  color: var(--accent);
+  margin-bottom: var(--space-3);
+}
+.current-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: var(--space-3); }
+.current-stat { font-size: 12.5px; color: var(--text-muted); }
+.current-stat strong { display: block; font-size: 15px; color: var(--text); font-weight: 600; margin-bottom: 2px; }
+/* DIVIDER */
+hr { border: none; border-top: 1px solid var(--border); margin: var(--space-4) 0; }
+/* FUTURE SECTION HEADING */
+.future-heading {
+  font-family: var(--font-display);
+  font-size: 28px;
+  font-weight: 800;
+  letter-spacing: -0.8px;
+  color: var(--text);
+  margin-bottom: var(--space-2);
+  margin-top: var(--space-12);
+  padding-top: var(--space-8);
+  border-top: 1px solid var(--border);
+  scroll-margin-top: var(--space-8);
+}
+.future-sub { color: var(--text-muted); font-size: 14px; margin-bottom: var(--space-8); }
+.priority-label { font-size: 11px; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+/* scrollbar */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.12); border-radius: 3px; }
+</style>
+</head>
+<body>
+<div class="layout">
+
+<!-- SIDEBAR -->
+<nav class="sidebar">
+  <div class="sidebar-logo">
+    🐸 Muga Kombat
+    <span>Game Design Document</span>
+  </div>
+
+  <div class="sidebar-section">Механики</div>
+  <a href="#splashes"><span class="dot" style="background:#ffd84a"></span>Сплеши</a>
+  <a href="#shop"><span class="dot" style="background:#5ba3ff"></span>Магазин</a>
+  <a href="#muga"><span class="dot" style="background:#7fffb2"></span>Муга</a>
+  <a href="#inventory"><span class="dot" style="background:#b07aff"></span>Инвентарь</a>
+  <a href="#longtap"><span class="dot" style="background:#ffaa4a"></span>Лонг-тап</a>
+  <a href="#combo"><span class="dot" style="background:#ff5a6a"></span>Комбо-клик</a>
+
+  <div class="sidebar-section">Прогрессия</div>
+  <a href="#upgrades"><span class="dot" style="background:#5ba3ff"></span>Апгрейды</a>
+  <a href="#achievements"><span class="dot" style="background:#ffd84a"></span>Достижения</a>
+  <a href="#dailies"><span class="dot" style="background:#ffaa4a"></span>Дейлики</a>
+  <a href="#stats"><span class="dot" style="background:#7fffb2"></span>Статы</a>
+  <a href="#cursors"><span class="dot" style="background:#b07aff"></span>Курсоры</a>
+
+  <div class="sidebar-section">Мета</div>
+  <a href="#inner-stats"><span class="dot" style="background:#5ba3ff"></span>Статистика</a>
+  <a href="#leaderboard"><span class="dot" style="background:#ff5a6a"></span>Лидерборд</a>
+  <a href="#future"><span class="dot" style="background:#7fffb2"></span>Планы</a>
+</nav>
+
+<!-- MAIN -->
+<main class="main">
+  <h1>Game Design <span class="tag">v0.1 — брейншторм</span></h1>
+  <p class="subtitle">Детальный разбор каждой механики Muga Kombat + идеи для развития игры.</p>
+
+  <!-- CURRENT STATE -->
+  <div class="current-box">
+    <h3>Текущее состояние кодовой базы</h3>
+    <div class="current-grid">
+      <div class="current-stat"><strong>4 курсора</strong>hello, muuum, muga-pixeled, muga-train</div>
+      <div class="current-stat"><strong>10 апгрейдов</strong>manual-click, auto-click, 2×stats, splash, 3×longtap, 2×cursor</div>
+      <div class="current-stat"><strong>5 дейликов</strong>клики, монеты, лонг-тап, AIM, сплеши</div>
+      <div class="current-stat"><strong>6 ачивок</strong>void-click, buy-all-shop, splashes, streak, dailies, all-achievements</div>
+      <div class="current-stat"><strong>8 вариантов сплешей</strong>based / huh / love / old / omfg / pause / shit / sunflower</div>
+      <div class="current-stat"><strong>Pinia + useStorage</strong>localStorage-персистентность для всего прогресса</div>
+    </div>
+  </div>
+
+  <!-- ==================== SPLASHES ==================== -->
+  <section class="section" id="splashes">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,216,74,0.12); color:var(--yellow)">✨</div>
+      <h2>Сплеши на экране</h2>
+      <span class="section-meta badge badge-yellow">Реализовано</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Что есть сейчас</div>
+        <ul>
+          <li>8 вариантов изображений (based, huh, love, old, omfg, pause, shit, sunflower)</li>
+          <li>Спавн при клике с шансом <code>splashChance</code> (базовый 10%)</li>
+          <li>Анимация <code>splash-pop</code>: scale 0.4→1.15→0.95→1→уходит вверх за 1.8с</li>
+          <li>Трекинг уникальных вариантов через <code>seenSplashVariants</code></li>
+          <li>Ачивка за сбор всех 8 вариантов</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Механика начисления</div>
+        <ul>
+          <li><code>spawnScreenSplash(x, y)</code> вызывается при каждом клике</li>
+          <li>Случайный вариант из массива SPLASH_VARIANTS</li>
+          <li>Автоудаление через 1800ms по id</li>
+          <li>Шанс увеличивается апгрейдом <em>splash-chance</em> (+5% за уровень, макс 80%)</li>
+          <li>Бонус из дейлика <em>collect-splash</em> (+10% на 10 мин)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Редкие сплеши:</strong> ввести градацию редкости (common / rare / legendary). Rare-сплеши дают +монеты при появлении. Legendary — временный буст всем статам на 30 секунд.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Размер под combo:</strong> во время активного комбо-буста сплеши в 1.5× крупнее и имеют golden-vibe эффект (CSS filter: sepia + hue-rotate).</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Кликабельные сплеши:</strong> с небольшим шансом (5%) сплеш оказывается «золотым» и кликабельным — даёт бонусные монеты или ускоряет кулдаун лонг-тапа.</div></div>
+  </section>
+
+  <!-- ==================== SHOP ==================== -->
+  <section class="section" id="shop">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,163,255,0.12); color:var(--blue)">🛒</div>
+      <h2>Магазин</h2>
+      <span class="section-meta badge badge-blue">Реализовано</span>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="card-title">Апгрейды (вкладка)</div>
+        <ul>
+          <li>Ручные клики (5 ур.)</li>
+          <li>Авто-клики (5 ур.)</li>
+          <li>Стат: миссклик (5 ур.)</li>
+          <li>Стат: двойной клик (4 ур.)</li>
+          <li>Шанс сплеша (3 ур.)</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Курсоры (вкладка)</div>
+        <ul>
+          <li>4 курсора с разными бонусами</li>
+          <li>Апгрейды курсора (cursor-click, cursor-long-tap)</li>
+          <li>Разделитель между курсорами и апгрейдами к ним</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Лонг-тап (вкладка)</div>
+        <ul>
+          <li>Множитель лонг-тапа (3 ур.)</li>
+          <li>Длительность лонг-тапа (3 ур.)</li>
+          <li>Скорость начисления (3 ур.)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-title">🖱️ Лонг-тап в магазине — как должен работать</div>
+      <p>Удержание пальца/мыши на айтеме в магазине. Вариант UX: прогресс-баp заполняется 1.5с → покупка совершается. Это позволяет покупать без случайных тапов на мобильном. Нужно добавить визуальный feedback на кнопке <code>.shop-item</code> — ring-анимация вокруг границы. При отпускании до завершения — сброс прогресса.</p>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Уведомление о доступных покупках:</strong> badge на кнопке «Магазин» в боковой панели с числом доступных апгрейдов (монет достаточно, но ещё не куплено).</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Предпросмотр эффекта:</strong> при hover/focus на айтеме — небольшой tooltip с тем, как изменится конкретный стат после покупки. «После покупки: клик +2 → +5».</div></div>
+  </section>
+
+  <!-- ==================== MUGA ==================== -->
+  <section class="section" id="muga">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(127,255,178,0.1); color:var(--accent)">🐸</div>
+      <h2>Муга</h2>
+      <span class="section-meta badge badge-green">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Текущая механика клика</div>
+      <p>Клик по муге → <code>clickMuga(x,y)</code> → проверка миссклика → подсчёт монет (с учётом double-click chance и combo-буста) → спавн сплеша → прогресс комбо-бара → шанс тригера AIM-Муги. Мульти-тач реализован через <code>useMultiTouch</code> — каждый палец регистрируется независимо.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">AIM-Муга (уже есть)</div>
+        <ul>
+          <li>Шанс срабатывания: <code>aimMugaChance</code> (базовый 5%)</li>
+          <li>8 мини-муг появляются рандомно на экране</li>
+          <li>Таймер 8 секунд на клик всех</li>
+          <li>Успех → награда x20 от clickPower × 8</li>
+          <li>Провал → штраф к AIM-шансу (×0.2) на 30 секунд</li>
+          <li>Таймер-бар внизу экрана с danger-состоянием</li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">Комбо-бар (уже есть)</div>
+        <ul>
+          <li>Заполняется на +0.12 за каждый клик</li>
+          <li>При 100% → активирует буст ×5 на 4 секунды</li>
+          <li>Буст затухает нелинейно (базовый decay + ускорение)</li>
+          <li>Пассивный сброс -0.15 при 800мс бездействия</li>
+          <li>Не реализован отдельный UI-элемент (надо добавить!)</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Визуализация комбо-бара:</strong> сейчас нет явного UI для прогресса комбо. Нужен прогресс-бар под мугой с цветовой градацией: зелёный→жёлтый→красный при 100% взрыв-анимация и временное свечение вокруг муги.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Муга-реакции:</strong> разные спрайты муги в зависимости от состояния — обычный, long-tap, overflow (красный), cooldown (серый), во время AIM-режима (испуганный).</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Звуки:</strong> лёгкие звуковые эффекты на клик, лонг-тап, комбо-взрыв, появление AIM-муги. Web Audio API — без внешних файлов через синтез или короткие base64-аудио.</div></div>
+  </section>
+
+  <!-- ==================== INVENTORY ==================== -->
+  <section class="section" id="inventory">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(176,122,255,0.12); color:var(--purple)">🎒</div>
+      <h2>Инвентарь</h2>
+      <span class="section-meta badge badge-purple">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">4 вкладки инвентаря</div>
+      <table class="stat-table">
+        <thead><tr><th>Вкладка</th><th>Содержимое</th><th>Состояние</th></tr></thead>
+        <tbody>
+          <tr><td>Дейлики</td><td>Активные задания, прогресс-бары, бонус-бейджи</td><td><span class="badge badge-green">Готово</span></td></tr>
+          <tr><td>Курсоры</td><td>Купленные курсоры, статы, активный курсор</td><td><span class="badge badge-green">Готово</span></td></tr>
+          <tr><td>Апгрейды</td><td>Список купленных апгрейдов с текущим уровнем</td><td><span class="badge badge-green">Готово</span></td></tr>
+          <tr><td>Достижения</td><td>Все ачивки, закрытые скрыты (???), открытые с описанием</td><td><span class="badge badge-green">Готово</span></td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Badge на вкладке:</strong> если есть активный бонус от дейлика, показывать пульсирующий зелёный dot на вкладке «Дейлики». Если разблокилась новая ачивка — badge на вкладке «Достижения».</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Сортировка апгрейдов:</strong> в инвентаре показывать апгрейды сгруппированно по категориям (клик / авто-клик / статы / лонг-тап / курсор) с subheader'ами.</div></div>
+  </section>
+
+  <!-- ==================== LONG TAP ==================== -->
+  <section class="section" id="longtap">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,170,74,0.12); color:var(--orange)">⏳</div>
+      <h2>Лонг-тап</h2>
+      <span class="section-meta badge badge-orange">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Логика механики</div>
+      <p>Удержание кнопки/тача → <code>useLongTap.start()</code> → setInterval тикает монеты каждые <code>tickIntervalMs</code>мс → по истечении <code>maxDurationMs</code> переполнение (overflow) → <code>stop(true)</code> штраф (монеты не засчитываются) → кулдаун. Правильный лонг-тап: <code>stop(false)</code> → монеты засчитаны, кулдаун.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Текущие статы (формулы)</div>
+        <table class="stat-table">
+          <thead><tr><th>Стат</th><th>Формула</th></tr></thead>
+          <tbody>
+            <tr><td>Множитель</td><td>2 + level×0.5 + cursorLevel×0.2</td></tr>
+            <tr><td>Макс. время</td><td>3000 + level×1000 мс</td></tr>
+            <tr><td>Интервал тика</td><td>max(100, 300 − level×50) мс</td></tr>
+            <tr><td>Кулдаун</td><td>5000 мс (пока фиксированный)</td></tr>
+            <tr><td>Монеты/тик</td><td>ceil(clickPower/2 + level×0.5)</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Визуальные состояния</div>
+        <ul>
+          <li><strong>Обычный</strong>: муга без эффектов</li>
+          <li><strong>Активный</strong>: scale(1.08) + SVG-кольцо с прогрессом</li>
+          <li><strong>Overflow</strong>: красная drop-shadow + статус «!»</li>
+          <li><strong>Cooldown</strong>: opacity 0.6 + статус «...»</li>
+        </ul>
+        <br>
+        <p style="font-size:13px;color:var(--red)">⚠️ Нет UI для кулдауна (числовой обратный отсчёт). Сейчас только opacity.</p>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Обратный отсчёт кулдауна:</strong> показывать число секунд под мугой во время кулдауна вместо просто «...». Можно анимировать как старый LCD-дисплей с Minecraft-шрифтом.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Апгрейд кулдауна:</strong> сейчас кулдаун захардкожен в 5000мс. Добавить апгрейд <em>long-tap-cooldown</em> (3 уровня, −1с за уровень) в магазин в таб лонг-тапа.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Хапик («хороший момент»):</strong> в случайный момент в последние 500мс перед overflow появляется мерцание/звук — сигнал о «sweet spot» зоне, за отпускание в которой дополнительный бонус +20% монет.</div></div>
+  </section>
+
+  <!-- ==================== COMBO ==================== -->
+  <section class="section" id="combo">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,90,106,0.12); color:var(--red)">💥</div>
+      <h2>Комбо-клик</h2>
+      <span class="section-meta badge badge-red">Частично</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Что реализовано</div>
+      <p>AIM-Муга — это и есть комбо-клик: муга распадается на 8 мини-муг. Кнопки позиционируются через <code>position: absolute</code> в процентах (8%–92% по x/y) с рандомным размером 48–95px. Анимация bounce (<code>mini-bounce</code>). При клике — сплайс из массива, отсчёт в <code>aimMugaRemaining</code>.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Связь с курсорами — TODO</div>
+        <p>Задуманная механика: во время комбо-клика размер курсора увеличивается (hitbox шире). Сейчас <code>sizeMultiplier</code> в <code>game-cursor.vue</code> всегда возвращает 1. Нужно передавать состояние <code>aimMuga.active</code> и применять множитель на основе уровня курсора.</p>
+      </div>
+      <div class="card">
+        <div class="card-title">Шанс срабатывания через мугу</div>
+        <p>Текущий <code>aimMugaChance</code>: базовые 5% + бонус от дейлика trigger-aim-muga (+0.5%, 15 мин). Нет апгрейда для увеличения шанса в магазине. Максимум захардкожен 30%. Пенальти после провала сбрасывает шанс до 1% (×0.2 фактор).</p>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Разные конфигурации AIM-муги:</strong> количество мини-муг зависит от уровня апгрейда (8 → 12 → 16). Больше штук = больше reward. Добавить апгрейд <em>aim-muga-count</em> в магазин.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Разные паттерны движения:</strong> мини-муги не просто bouncing, а медленно дрейфуют к краям экрана. Чем выше уровень курсора — тем медленнее двигаются (лёгче кликать).</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Цепной AIM:</strong> если завершить AIM-мугу за 3 секунды — немедленно запускается второй AIM без кулдауна, с удвоенной наградой.</div></div>
+  </section>
+
+  <!-- ==================== UPGRADES ==================== -->
+  <section class="section" id="upgrades">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,163,255,0.12); color:var(--blue)">⬆️</div>
+      <h2>Апгрейды</h2>
+      <span class="section-meta badge badge-blue">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Система уровней</div>
+      <p>Каждый апгрейд — массив <code>UpgradeLevel[]</code>. При покупке <code>buyOrUpgrade(id)</code> увеличивает <code>level</code> в <code>ownedUpgrades</code>. В магазине показывается следующий уровень через <code>nextLevelData</code>. В инвентаре показывается текущий уровень (<code>currentLevel / maxLevel</code>). Все эффекты апгрейдов вычисляются реактивно в computed через <code>getUpgradeLevel(id)</code>.</p>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Все 10 апгрейдов</div>
+        <table class="stat-table">
+          <thead><tr><th>ID</th><th>Уровни</th><th>Категория</th></tr></thead>
+          <tbody>
+            <tr><td>manual-click</td><td>5</td><td>click</td></tr>
+            <tr><td>auto-click</td><td>5</td><td>auto-click</td></tr>
+            <tr><td>stats-missclick</td><td>5</td><td>stats</td></tr>
+            <tr><td>stats-double-click</td><td>4</td><td>stats</td></tr>
+            <tr><td>splash-chance</td><td>3</td><td>splash</td></tr>
+            <tr><td>long-tap-multiplier</td><td>3</td><td>long-tap</td></tr>
+            <tr><td>long-tap-duration</td><td>3</td><td>long-tap</td></tr>
+            <tr><td>long-tap-speed</td><td>3</td><td>long-tap</td></tr>
+            <tr><td>cursor-click</td><td>3</td><td>cursor</td></tr>
+            <tr><td>cursor-long-tap</td><td>2</td><td>cursor</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Механика «пункт на улучшение»</div>
+        <p>При покупке апгрейда в магазине он сразу же появляется в инвентаре с уровнем 1. В магазине продолжают показываться следующие уровни апгрейда как отдельные строки (или та же строка с updated cost). Логика в <code>shop-store.ts</code>: <code>upgradeShopItems</code> всегда показывает nextLevel данные для каждого апгрейда.</p>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Апгрейд для AIM-шанса:</strong> сейчас нет апгрейда повышающего <code>aimMugaChance</code> в магазине. Добавить <em>aim-muga-chance</em> (3 уровня, +5% каждый) в таб апгрейдов или отдельный таб «AIM».</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Апгрейд кулдауна лонг-тапа:</strong> <em>long-tap-cooldown</em> (3 уровня: 5с → 4с → 3с → 2с) в таб лонг-тапа магазина.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Визуализация прогресса в магазине:</strong> маленький прогресс-бар рядом с ценой показывает сколько уровней куплено (filled dots или segmented bar). Прокаченный до максимума апгрейд показывает бейдж MAX вместо цены.</div></div>
+  </section>
+
+  <!-- ==================== ACHIEVEMENTS ==================== -->
+  <section class="section" id="achievements">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,216,74,0.12); color:var(--yellow)">🏆</div>
+      <h2>Достижения</h2>
+      <span class="section-meta badge badge-yellow">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">6 текущих ачивок и их бонусы к статам</div>
+      <table class="stat-table">
+        <thead><tr><th>ID</th><th>Условие</th><th>Бонус к стату</th></tr></thead>
+        <tbody>
+          <tr><td>void-click</td><td>Совершить миссклик</td><td>missClickChance −1%</td></tr>
+          <tr><td>buy-all-shop</td><td>Купить все апгрейды и курсоры</td><td>doubleClickChance +5%</td></tr>
+          <tr><td>collect-all-splashes</td><td>Увидеть все 8 вариантов сплешей</td><td>splashChance +10%</td></tr>
+          <tr><td>daily-streak-7</td><td>7 дней подряд играть</td><td>doubleClickChance +3%</td></tr>
+          <tr><td>complete-10-dailies</td><td>Выполнить 10 дейликов суммарно</td><td>autoClickIntervalMs −100мс</td></tr>
+          <tr><td>unlock-all-achievements</td><td>Открыть все ачивки</td><td>doubleClickChance +10%</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Уведомление об ачивке:</strong> при разблокировке показывать всплывающий toast снизу экрана «🏆 Ачивка разблокирована: [название]» с анимацией slide-up. Использовать тот же механизм что и screenSplashes.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Категории ачивок:</strong> сгруппировать ачивки: 🖱️ Клики | ⏳ Лонг-тап | 🛒 Магазин | 📅 Активность | ✨ Сплеши. Визуально как сетка с категорийными заголовками.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Счётчик ачивок в хедере:</strong> «3/6 🏆» рядом с балансом монет показывает общий прогресс ачивок и мотивирует продолжать.</div></div>
+  </section>
+
+  <!-- ==================== DAILIES ==================== -->
+  <section class="section" id="dailies">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,170,74,0.12); color:var(--orange)">📅</div>
+      <h2>Дейлики</h2>
+      <span class="section-meta badge badge-orange">Реализовано</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">Правила системы</div>
+        <ul>
+          <li>Максимум 3 активных дейлика</li>
+          <li>При входе в новый день — незавершённые остаются, добавляются новые до 3</li>
+          <li>Дейлик при завершении даёт временный бонус к стату на N минут</li>
+          <li>Бонус отображается пульсирующим бейджем <code>BONUS</code></li>
+          <li>Каждые 60 секунд бонусы пересчитываются через <code>pushBonuses()</code></li>
+        </ul>
+      </div>
+      <div class="card">
+        <div class="card-title">5 типов дейликов</div>
+        <table class="stat-table">
+          <thead><tr><th>ID</th><th>Цель</th><th>Бонус (длит.)</th></tr></thead>
+          <tbody>
+            <tr><td>click-100</td><td>100 кликов</td><td>+5% double-click (5 мин)</td></tr>
+            <tr><td>earn-1000</td><td>Заработать 1000 монет</td><td>−50мс autoClick (10 мин)</td></tr>
+            <tr><td>survive-long-tap</td><td>1 успешный лонг-тап</td><td>−2% миссклик (8 мин)</td></tr>
+            <tr><td>trigger-aim-muga</td><td>1 AIM-муга</td><td>+0.5% AIM-шанс (15 мин)</td></tr>
+            <tr><td>collect-splash</td><td>5 сплешей</td><td>+10% splash-chance (10 мин)</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Таймер на бонусе:</strong> сейчас нет обратного отсчёта бонуса. Добавить <code>timeLeft</code> computed в <code>dailiesWithDef</code> и показывать «BONUS 4:32» вместо просто «BONUS».</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Дейлик «выживи 3 лонг-тапа подряд»:</strong> серийное задание с прогрессом 0/3. Дейлики с цепочками повышают вовлечённость.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Дейлик «заработай X монет за одну сессию»:</strong> использует <code>sessionEarned</code> который уже трекается в store. Просто добавить дейлик-тип.</div></div>
+  </section>
+
+  <!-- ==================== STATS ==================== -->
+  <section class="section" id="stats">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(127,255,178,0.1); color:var(--accent)">📊</div>
+      <h2>Статы</h2>
+      <span class="section-meta badge badge-green">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">GameStats — вычисляемый объект</div>
+      <p>Все статы — computed в <code>game-store.ts</code>. Формула: базовое значение + бонус апгрейда + <code>dailiesBonuses</code> + <code>achievementBonuses</code>. Апгрейды и ачивки хранятся в отдельных <code>ref</code> объектах и суммируются реактивно. Дейлики пересчитываются через watcher каждую минуту.</p>
+    </div>
+
+    <table class="stat-table" style="margin-bottom: var(--space-4)">
+      <thead><tr><th>Стат</th><th>Базовое</th><th>Источники бонусов</th><th>Ограничение</th></tr></thead>
+      <tbody>
+        <tr><td>missClickChance</td><td>5%</td><td>stats-missclick, void-click ачивка, survive-long-tap дейлик</td><td>min 0%</td></tr>
+        <tr><td>doubleClickChance</td><td>0%</td><td>stats-double-click, ачивки ×3, click-100 дейлик</td><td>max 50%</td></tr>
+        <tr><td>autoClickIntervalMs</td><td>1000мс</td><td>auto-click апгрейд, complete-10-dailies ачивка, earn-1000 дейлик</td><td>min 200мс</td></tr>
+        <tr><td>aimMugaChance</td><td>5%</td><td>trigger-aim-muga дейлик, пенальти при провале</td><td>max 30%</td></tr>
+        <tr><td>splashChance</td><td>10%</td><td>splash-chance апгрейд, collect-all-splashes ачивка, collect-splash дейлик</td><td>max 80%</td></tr>
+      </tbody>
+    </table>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Детальная панель статов:</strong> в текущей <code>stats-panel.vue</code> показывать не просто итоговое значение, а разбивку: «базовый + апгрейды + дейлики + ачивки = итого» при hover на строку.</div></div>
+  </section>
+
+  <!-- ==================== CURSORS ==================== -->
+  <section class="section" id="cursors">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(176,122,255,0.12); color:var(--purple)">🖱️</div>
+      <h2>Курсоры</h2>
+      <span class="section-meta badge badge-purple">Реализовано</span>
+    </div>
+
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">4 курсора в игре</div>
+        <table class="stat-table">
+          <thead><tr><th>Курсор</th><th>Цена</th><th>+Клик</th><th>×ЛТ</th></tr></thead>
+          <tbody>
+            <tr><td>Hello (default)</td><td>0</td><td>+0</td><td>×1.0</td></tr>
+            <tr><td>Мум</td><td>500</td><td>+2</td><td>×1.2</td></tr>
+            <tr><td>Муга Пиксель</td><td>2 000</td><td>+5</td><td>×1.5</td></tr>
+            <tr><td>Муга Поезд</td><td>10 000</td><td>+15</td><td>×2.0</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">Курсор во время комбо</div>
+        <p>Задумка: при <code>aimMuga.active === true</code> размер курсора умножается на <code>1 + cursorLevel × 0.1</code> (например, макс уровень курсора даёт +30% к hitbox). Нужно передать состояние в <code>game-cursor.vue</code> и обновить <code>sizeMultiplier</code> computed. Это прямо сейчас возвращает константу 1.</p>
+      </div>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Уникальные анимации курсоров:</strong> Муга-Поезд курсор чуть покачивается по синусу. Пиксельная муга — дискретное движение (snap to 4px grid). Добавляет характер без больших затрат.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Эффект следа:</strong> активный курсор оставляет короткий след из частиц. Кастомный цвет частиц на каждый курсор (hello → белый, muuum → розовый, поезд → оранжевый).</div></div>
+  </section>
+
+  <!-- ==================== INNER STATS ==================== -->
+  <section class="section" id="inner-stats">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(91,163,255,0.12); color:var(--blue)">📈</div>
+      <h2>Внутриигровая статистика</h2>
+      <span class="section-meta badge badge-blue">Реализовано</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Текущий InternalStats</div>
+      <table class="stat-table">
+        <thead><tr><th>Поле</th><th>Описание</th></tr></thead>
+        <tbody>
+          <tr><td>totalClicks</td><td>Всего кликов по муге</td></tr>
+          <tr><td>totalCoinsEarned</td><td>Всего монет заработано за всё время</td></tr>
+          <tr><td>totalLongTaps</td><td>Успешных лонг-тапов</td></tr>
+          <tr><td>aimMugasTriggered / Completed</td><td>Запущено / завершено AIM-муг</td></tr>
+          <tr><td>splashesCollected</td><td>Появилось сплешей</td></tr>
+          <tr><td>seenSplashVariants</td><td>Массив уникальных вариантов</td></tr>
+          <tr><td>daysPlayed</td><td>Дней игры (стрик)</td></tr>
+          <tr><td>lastPlayedDate</td><td>Дата последней игры</td></tr>
+          <tr><td>dailiesCompleted</td><td>Суммарно выполнено дейликов</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Статистика лонг-тапов:</strong> добавить <code>totalLongTapOverflows</code> (провалов) и показывать «успех/провал» соотношение. Мотивирует улучшать навык.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Время в игре:</strong> трекать <code>totalPlaytimeMs</code> через setInterval каждую минуту пока вкладка активна (Page Visibility API). Показывать «Всего в игре: 3ч 24мин».</div></div>
+  </section>
+
+  <!-- ==================== LEADERBOARD ==================== -->
+  <section class="section" id="leaderboard">
+    <div class="section-header">
+      <div class="section-icon" style="background:rgba(255,90,106,0.12); color:var(--red)">🏅</div>
+      <h2>Лидерборд</h2>
+      <span class="section-meta badge badge-red">Локальный</span>
+    </div>
+
+    <div class="card">
+      <div class="card-title">Текущая реализация</div>
+      <p>Локальный localStorage-лидерборд. Отправка очков по имени игрока. Хранит до 50 записей, показывает топ-20. Сортировка по <code>coins</code> desc. Отображает имя, счёт и дату. Форма скрывается после отправки (<code>submitted</code> ref).</p>
+    </div>
+
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Онлайн-лидерборд:</strong> Firebase Realtime Database или Supabase. Простой POST с именем и счётом. Подсветка строки текущего игрока если его запись уже есть. Row с «Ваш результат» sticky внизу таблицы.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Еженедельный сброс:</strong> лидерборд сбрасывается раз в неделю. Хранить hall-of-fame с топ-3 прошлой недели отдельно. Создаёт повторяемое соревновательное событие.</div></div>
+    <div class="idea"><div class="idea-icon">💡</div><div class="idea-text"><strong>Идея — Категории лидерборда:</strong> всего монет / кликов / лонг-тапов / ачивок. Переключение между категориями табами.</div></div>
+  </section>
+
+  <!-- ==================== FUTURE PLANS ==================== -->
+  <div id="future">
+    <div class="future-heading">Планы на будущее</div>
+    <p class="future-sub">Приоритизированный бэклог фичей на основе текущего состояния кодовой базы.</p>
+
+    <div style="margin-bottom: var(--space-3)">
+      <div class="status-row">
+        <span class="badge badge-red">P0 — Критично</span>
+        <span class="badge badge-orange">P1 — Важно</span>
+        <span class="badge badge-blue">P2 — Желательно</span>
+        <span class="badge badge-purple">P3 — Идеи</span>
+      </div>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">1</div>
+      <div>
+        <div class="plan-title">Комбо-бар UI</div>
+        <div class="plan-desc">Нет визуального элемента для комбо-прогресса. Добавить прогресс-бар под мугой, анимацию вспышки при активации буста, цифровой множитель (×5) на экране во время буста. Уже есть весь state в <code>comboBar</code> ref в game-store.</div>
+      </div>
+      <span class="badge badge-red priority-label">P0</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">2</div>
+      <div>
+        <div class="plan-title">Кулдаун лонг-тапа — числовой таймер</div>
+        <div class="plan-desc">Сейчас кулдаун отображается как <code>opacity 0.6</code> без счётчика. Добавить <code>cooldownRemaining</code> computed в <code>useLongTap</code> через <code>Date.now()</code> и <code>requestAnimationFrame</code>, показывать обратный отсчёт «3.2с» под мугой.</div>
+      </div>
+      <span class="badge badge-red priority-label">P0</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">3</div>
+      <div>
+        <div class="plan-title">Размер курсора в AIM-режиме</div>
+        <div class="plan-desc">Реализовать задуманную механику увеличения hitbox курсора во время комбо-клика. В <code>game-cursor.vue</code> обновить <code>sizeMultiplier</code>: <code>gameStore.aimMuga.active ? 1 + cursorUpgradeLevel * 0.15 : 1</code>. Требуется передать зависимость от <code>cursor-click</code> апгрейда.</div>
+      </div>
+      <span class="badge badge-orange priority-label">P1</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">4</div>
+      <div>
+        <div class="plan-title">Апгрейд кулдауна лонг-тапа</div>
+        <div class="plan-desc">Добавить <code>UpgradeDefinition</code> с id <code>long-tap-cooldown</code>, category <code>long-tap</code>, 3 уровня (5000→4000→3000→2000мс). В <code>useLongTap</code> заменить хардкоженные 5000мс на <code>gameStore.getUpgradeLevel('long-tap-cooldown')</code> формулу.</div>
+      </div>
+      <span class="badge badge-orange priority-label">P1</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">5</div>
+      <div>
+        <div class="plan-title">Апгрейд для AIM-шанса</div>
+        <div class="plan-desc">Добавить <code>aim-muga-chance</code> апгрейд (3 уровня, +5% каждый). Сейчас AIM-шанс можно поднять только через дейлик. Интегрировать в formulas <code>gameStats</code> computed. Разместить в вкладке «Апгрейды» в магазине.</div>
+      </div>
+      <span class="badge badge-orange priority-label">P1</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">6</div>
+      <div>
+        <div class="plan-title">Toast-уведомления об ачивках</div>
+        <div class="plan-desc">При <code>unlockAchievement()</code> добавлять в очередь уведомление. Компонент <code>achievement-toast.vue</code> с анимацией slide-up + auto-dismiss через 3 секунды. Аналог <code>screen-splashes</code> но для системных событий.</div>
+      </div>
+      <span class="badge badge-orange priority-label">P1</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">7</div>
+      <div>
+        <div class="plan-title">Таймер бонуса дейлика</div>
+        <div class="plan-desc">Добавить в <code>dailiesWithDef</code> поле <code>timeLeftMs</code>: <code>daily.bonusExpiresAt ? Math.max(0, daily.bonusExpiresAt - Date.now()) : 0</code>. Отображать обратный отсчёт в бейдже «BONUS 4:32». Обновлять через <code>useIntervalFn</code> каждую секунду.</div>
+      </div>
+      <span class="badge badge-blue priority-label">P2</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">8</div>
+      <div>
+        <div class="plan-title">Badge на кнопке магазина</div>
+        <div class="plan-desc">Computed в shop-store: <code>availablePurchasesCount</code> — количество апгрейдов/курсоров которые игрок может купить прямо сейчас. Показывать как число в красном badge на кнопке «🛒» в sidebar-tabs. Реализовать аналогично <code>upgradeShopItems</code> фильтрацией по <code>affordable && !maxed</code>.</div>
+      </div>
+      <span class="badge badge-blue priority-label">P2</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">9</div>
+      <div>
+        <div class="plan-title">Логика цен апгрейдов (экспоненциальная)</div>
+        <div class="plan-desc">Ссылка в задаче: v0.dev/chat/JCySAXS71h9. Пересмотреть кривую стоимостей апгрейдов. Текущие цены линейные/ручные. Ввести формулу <code>baseCost * scaleFactor^level</code> для автоматического расчёта стоимости уровней. Это позволит легко добавлять новые уровни без ручной правки массива.</div>
+      </div>
+      <span class="badge badge-blue priority-label">P2</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">10</div>
+      <div>
+        <div class="plan-title">Мульти-тач улучшения</div>
+        <div class="plan-desc">Ссылка: naqtn.github.io/WBBMTT/ — исследовать паттерны multi-touch tap. Текущая реализация <code>useMultiTouch</code> уже корректна. Добавить визуальный feedback для каждого активного тача — отдельный ripple-круг на координатах каждого пальца.</div>
+      </div>
+      <span class="badge badge-blue priority-label">P2</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">11</div>
+      <div>
+        <div class="plan-title">Онлайн-лидерборд</div>
+        <div class="plan-desc">Заменить localStorage на backend (Firebase / Supabase / простой Cloudflare Worker + KV). Структура записи: <code>{name, coins, date, version}</code>. Добавить rate-limiting по IP. Подсвечивать строку текущего игрока. Показывать rank «#42 из 1204».</div>
+      </div>
+      <span class="badge badge-purple priority-label">P3</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">12</div>
+      <div>
+        <div class="plan-title">Новые типы дейликов</div>
+        <div class="plan-desc">Идеи: «заработай 5000 монет за сессию» (sessionEarned уже есть), «3 лонг-тапа подряд» (нужен <code>consecutiveLongTaps</code> ref), «купи апгрейд» (watch на ownedUpgrades), «не промахнись 50 раз» (нужен <code>noMissStreak</code>). Всё легко добавляется в <code>dailies-store.ts</code>.</div>
+      </div>
+      <span class="badge badge-purple priority-label">P3</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">13</div>
+      <div>
+        <div class="plan-title">Новые достижения</div>
+        <div class="plan-desc">Идеи: «1000 кликов» (totalClicks), «провалить AIM-мугу» (aimMugasTriggered > aimMugasCompleted), «купить первый курсор», «совершить 5 лонг-тапов», «активировать комбо 10 раз» (нужен <code>comboActivations</code> в internalStats). Добавлять в <code>ACHIEVEMENT_DEFINITIONS</code> и <code>checkAllAchievements()</code>.</div>
+      </div>
+      <span class="badge badge-purple priority-label">P3</span>
+    </div>
+
+    <div class="plan-item">
+      <div class="plan-num">14</div>
+      <div>
+        <div class="plan-title">Редкие / кликабельные сплеши</div>
+        <div class="plan-desc">Новый тип <code>SplashVariant</code> — <code>golden</code>. 1% шанс появления вместо обычного сплеша. Кликабельный в течение 2 секунд. При клике — <code>addCoins(clickPower * 50)</code> + частицы. Требует расширить <code>ScreenSplash</code> интерфейс полем <code>clickable?: boolean</code> и обработчик в <code>screen-splash-item.vue</code>.</div>
+      </div>
+      <span class="badge badge-purple priority-label">P3</span>
+    </div>
+  </div>
+
+</main>
+</div>
+</body>
+</html>
