@@ -155,8 +155,12 @@ body {
   z-index: 99;
   opacity: 0;
   transition: opacity 0.3s;
+  pointer-events: none;
 }
-.sidebar-overlay.is-visible { opacity: 1; }
+.sidebar-overlay.is-visible {
+  opacity: 1;
+  pointer-events: auto;
+}
 
 /* ===== MAIN ===== */
 .main {
@@ -325,7 +329,6 @@ h2 {
 .stat-table {
   width: 100%;
   border-collapse: collapse;
-  overflow: auto;
 }
 .stat-table th {
   text-align: left;
